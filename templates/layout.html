@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>
+        {% if title %}
+        RJ's Blog - {{ title }}
+        {% else %}
+        RJ's Blog
+        {% endif %}
+    </title>
+</head>
+<body>
+        {% block content %}  <!-- block content is a placeholder for content that will be defined in child templates -->
+        {% endblock %}
+    </body>
+</html>

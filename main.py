@@ -1,7 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 
 app = FastAPI()
+templates = Jinja2Templates(directory="templates")
 
 
 posts: list[dict] = [
@@ -23,10 +25,10 @@ posts: list[dict] = [
 
 
 # Create first route
-@app.get("/", response_class=HTMLResponse, include_in_schema=False)     #decoclearator
-@app.get("/posts", response_class=HTMLResponse, include_in_schema=False) #Both route and /posts will execute the same function and return the same response
-def home():   # function that I'm decorating
-    return f"<h1>{posts[0]['title']}</h1>"  #dictionary that will be converted to JSON and sent as a response
+@app.get("/", include_in_schema=False)     #declearator
+@app.get("/posts", include_in_schema=False) #Both route and /posts will execute the same function and return the same response
+def home(request: Request):   # function that I'm decorating
+    return templates.TemplateResponse(request=request, name="home.html", context={"posts": posts, "title": "Home"}) #returning the template response and passing the request object to the template instead of html, pass data to template (dictionary)
 
 
 # Creating API endpoint that returns the list of disctionaries
