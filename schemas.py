@@ -17,6 +17,13 @@ class UserResponse(UserBase):
     id: int
     image_file: str | None
     image_path: str # property on user model
+    
+class UserUpdate(BaseModel): # whats shared between UserCreate and UserResponse
+    username: str | None = Field(default=None, min_length=1, max_length=50)
+    email: EmailStr | None = Field(default=None, max_length=120)
+    image_file: str | None = Field(default=None, min_length=1, max_length=200)
+    
+    
 
 
 class PostBase(BaseModel):   # shared between returning and creating a post
@@ -28,7 +35,10 @@ class PostBase(BaseModel):   # shared between returning and creating a post
 class PostCreate(PostBase):
     user_id: int # TEMPORARY: will be replaced with current user from session
 
-
+class PostUpdate(BaseModel):   
+    title: str | None = Field(default=None, min_length=1, max_length=100)   # after = are constraints
+    content: str | None = Field(default=None, min_length=1)
+    
 #Defines what we return from API
 class PostResponse(PostBase):  # PostResponse inherits title, content and author from PostBase; adding id and date_posted.
     model_config = ConfigDict(from_attributes=True) # this tells pydantic that it can read data from object with attributes not just dictionaries
