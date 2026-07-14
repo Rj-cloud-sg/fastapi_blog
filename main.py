@@ -47,7 +47,8 @@ app.include_router(posts.router, prefix="/api/posts", tags=["posts"])
 async def home(request: Request, db: Annotated[AsyncSession, Depends(get_db)]):
     result = await db.execute( # await for the result of the query to be executed asynchronously
         select(models.Post)
-        .options(selectinload(models.Post.author)), #For async loading of related objects, we can use selectinload to load the related author object for each post in a single query, instead of making a separate query for each post.
+        .options(selectinload(models.Post.author)) #For async loading of related objects, we can use selectinload to load the related author object for each post in a single query, instead of making a separate query for each post.
+        .order_by(models.Post.date_posted.desc()), 
     )
     posts = result.scalars().all()
     return templates.TemplateResponse(
@@ -81,7 +82,9 @@ async def user_posts_page(
     user_id: int,
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
-    result = await db.execute(select(models.User).where(models.User.id == user_id))
+    result = await db.execute(
+        select(models.User)
+        .where(models.User.id == user_id))
     user = result.scalars().first()
     if not user:
         raise HTTPException(
@@ -91,7 +94,8 @@ async def user_posts_page(
     result = await db.execute(
         select(models.Post)
         .options(selectinload(models.Post.author)) # Needs selectinload to load the related author object for each post in a single query, instead of making a separate query for each post.
-        .where(models.Post.user_id == user_id),
+        .where(models.Post.user_id == user_id)
+        .order_by(models.Post.date_posted.desc()),
     )
     posts = result.scalars().all()
     return templates.TemplateResponse(
